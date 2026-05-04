@@ -1,0 +1,20 @@
+uploads = []
+outputs = []
+
+[[generated]]
+id = "cPcZJ13b8GpyzgwzBIbly"
+uri = "file://artifacts/vibeglobally/src/assets/images/hero.png"
+type = "image"
+title = "Hero banner operations team"
+
+[[generated]]
+id = "RxzC8l5qQekYxER_Ve3LQ"
+uri = "file://artifacts/vibeglobally/src/assets/images/values-art.png"
+type = "image"
+title = "Abstract VIBE values art"
+
+[[generated]]
+id = "UJ4vSOGcvL4U7Umet2hot"
+uri = "file://artifacts/vibeglobally/src/assets/images/global-business.png"
+type = "image"
+title = "Global business connections"

@@ -1,0 +1,542 @@
+openapi: 3.1.0
+info:
+  # Do not change the title, if the title changes, the import paths will be broken
+  title: Api
+  version: 0.1.0
+  description: API specification for VibeGlobally Virtual Assistance Services
+servers:
+  - url: /api
+    description: Base API path
+tags:
+  - name: health
+    description: Health operations
+  - name: auth
+    description: Authentication operations
+  - name: contacts
+    description: Contact form submissions
+  - name: testimonials
+    description: Client testimonials
+  - name: stats
+    description: Dashboard statistics
+  - name: content
+    description: Site content management
+  - name: settings
+    description: Admin app settings (SMTP, etc.)
+paths:
+  /healthz:
+    get:
+      operationId: healthCheck
+      tags: [health]
+      summary: Health check
+      description: Returns server health status
+      responses:
+        "200":
+          description: Healthy
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthStatus"
+
+  /auth/login:
+    post:
+      operationId: adminLogin
+      tags: [auth]
+      summary: Admin login
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginBody"
+      responses:
+        "200":
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LoginResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /auth/logout:
+    post:
+      operationId: adminLogout
+      tags: [auth]
+      summary: Admin logout
+      responses:
+        "200":
+          description: Logged out
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+
+  /auth/me:
+    get:
+      operationId: getAuthMe
+      tags: [auth]
+      summary: Get current session
+      responses:
+        "200":
+          description: Current session
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthMeResponse"
+
+  /contacts:
+    get:
+      operationId: listContacts
+      tags: [contacts]
+      summary: List all contact submissions
+      parameters:
+        - in: query
+          name: page
+          schema:
+            type: integer
+        - in: query
+          name: limit
+          schema:
+            type: integer
+        - in: query
+          name: status
+          schema:
+            type: string
+            enum: [new, read, responded]
+      responses:
+        "200":
+          description: List of contacts
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ContactList"
+    post:
+      operationId: createContact
+      tags: [contacts]
+      summary: Submit contact form
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateContactBody"
+      responses:
+        "201":
+          description: Contact created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Contact"
+
+  /contacts/{id}:
+    get:
+      operationId: getContact
+      tags: [contacts]
+      summary: Get contact by ID
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Contact details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Contact"
+    patch:
+      operationId: updateContact
+      tags: [contacts]
+      summary: Update contact status
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateContactBody"
+      responses:
+        "200":
+          description: Updated contact
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Contact"
+    delete:
+      operationId: deleteContact
+      tags: [contacts]
+      summary: Delete contact
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Deleted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+
+  /testimonials:
+    get:
+      operationId: listTestimonials
+      tags: [testimonials]
+      summary: List testimonials
+      responses:
+        "200":
+          description: List of testimonials
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TestimonialList"
+    post:
+      operationId: createTestimonial
+      tags: [testimonials]
+      summary: Create testimonial
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateTestimonialBody"
+      responses:
+        "201":
+          description: Created testimonial
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Testimonial"
+
+  /testimonials/{id}:
+    delete:
+      operationId: deleteTestimonial
+      tags: [testimonials]
+      summary: Delete testimonial
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Deleted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+
+  /stats/dashboard:
+    get:
+      operationId: getDashboardStats
+      tags: [stats]
+      summary: Get dashboard statistics
+      responses:
+        "200":
+          description: Dashboard stats
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DashboardStats"
+
+  /content/{section}:
+    get:
+      operationId: getSiteContent
+      tags: [content]
+      summary: Get site content for a section
+      parameters:
+        - in: path
+          name: section
+          required: true
+          schema:
+            type: string
+            enum: [hero, services, results, tools, clients, team, values, contact, faq, smtp]
+      responses:
+        "200":
+          description: Site content
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SiteContentResponse"
+        "400":
+          description: Unknown section
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    put:
+      operationId: updateSiteContent
+      tags: [content]
+      summary: Update site content for a section (admin only)
+      parameters:
+        - in: path
+          name: section
+          required: true
+          schema:
+            type: string
+            enum: [hero, services, results, tools, clients, team, values, contact, faq, smtp]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: true
+      responses:
+        "200":
+          description: Updated content
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SiteContentResponse"
+        "400":
+          description: Unknown section
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+components:
+  schemas:
+    HealthStatus:
+      type: object
+      properties:
+        status:
+          type: string
+      required:
+        - status
+
+    LoginBody:
+      type: object
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+      required:
+        - username
+        - password
+
+    LoginResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        message:
+          type: string
+      required:
+        - success
+        - message
+
+    AuthMeResponse:
+      type: object
+      properties:
+        authenticated:
+          type: boolean
+        username:
+          type: string
+      required:
+        - authenticated
+
+    SuccessResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        message:
+          type: string
+      required:
+        - success
+
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+      required:
+        - error
+
+    Contact:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        email:
+          type: string
+        phone:
+          type: string
+          nullable: true
+        company:
+          type: string
+          nullable: true
+        service:
+          type: string
+          nullable: true
+        message:
+          type: string
+        status:
+          type: string
+          enum: [new, read, responded]
+        createdAt:
+          type: string
+      required:
+        - id
+        - name
+        - email
+        - message
+        - status
+        - createdAt
+
+    CreateContactBody:
+      type: object
+      properties:
+        name:
+          type: string
+        email:
+          type: string
+        phone:
+          type: string
+          nullable: true
+        company:
+          type: string
+          nullable: true
+        service:
+          type: string
+          nullable: true
+        message:
+          type: string
+      required:
+        - name
+        - email
+        - message
+
+    UpdateContactBody:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: [new, read, responded]
+
+    ContactList:
+      type: object
+      properties:
+        contacts:
+          type: array
+          items:
+            $ref: "#/components/schemas/Contact"
+        total:
+          type: integer
+        page:
+          type: integer
+        limit:
+          type: integer
+      required:
+        - contacts
+        - total
+
+    Testimonial:
+      type: object
+      properties:
+        id:
+          type: string
+        clientName:
+          type: string
+        company:
+          type: string
+          nullable: true
+        content:
+          type: string
+        rating:
+          type: integer
+        createdAt:
+          type: string
+      required:
+        - id
+        - clientName
+        - content
+        - rating
+        - createdAt
+
+    CreateTestimonialBody:
+      type: object
+      properties:
+        clientName:
+          type: string
+        company:
+          type: string
+          nullable: true
+        content:
+          type: string
+        rating:
+          type: integer
+      required:
+        - clientName
+        - content
+        - rating
+
+    TestimonialList:
+      type: object
+      properties:
+        testimonials:
+          type: array
+          items:
+            $ref: "#/components/schemas/Testimonial"
+      required:
+        - testimonials
+
+    DashboardStats:
+      type: object
+      properties:
+        totalContacts:
+          type: integer
+        newContacts:
+          type: integer
+        respondedContacts:
+          type: integer
+        totalTestimonials:
+          type: integer
+        recentContacts:
+          type: array
+          items:
+            $ref: "#/components/schemas/Contact"
+      required:
+        - totalContacts
+        - newContacts
+        - respondedContacts
+        - totalTestimonials
+        - recentContacts
+
+    SiteContentResponse:
+      type: object
+      properties:
+        section:
+          type: string
+        content:
+          type: object
+          additionalProperties: true
+      required:
+        - section
+        - content
+

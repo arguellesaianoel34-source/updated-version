@@ -1,0 +1,28 @@
+{
+  "name": "functions",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "main": "dist/index.mjs",
+  "engines": {
+    "node": "20"
+  },
+  "scripts": {
+    "build": "node ./build.mjs"
+  },
+  "dependencies": {
+    "cookie-parser": "^1.4.7",
+    "cors": "^2",
+    "express": "^5",
+    "firebase": "^11.0.2",
+    "firebase-functions": "^6.0.0"
+  },
+  "devDependencies": {
+    "@types/cookie-parser": "^1.4.10",
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.6",
+    "@types/node": "^22",
+    "esbuild": "^0.27.3",
+    "typescript": "~5.9.2"
+  }
+}
